@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const scheduleContainer = document.getElementById('schedule-container');
-  const categorySearch = document.getElementById('category-search');
+  const searchInput = document.getElementById('search-input');
   let talks = [];
 
   fetch('/api/talks')
@@ -12,22 +12,28 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(data => {
       talks = data;
-      renderSchedule(talks);
+      renderSchedule(talks, searchInput.value);
     })
     .catch(error => {
         console.error('Error fetching talks:', error);
         scheduleContainer.innerHTML = '<p style="color: red;">Error: Could not load schedule data.</p>';
     });
 
-  categorySearch.addEventListener('input', () => {
-    const searchTerm = categorySearch.value.toLowerCase();
-    const filteredTalks = talks.filter(talk => 
-      talk.categories.some(category => category.toLowerCase().includes(searchTerm))
-    );
-    renderSchedule(filteredTalks);
+  searchInput.addEventListener('input', () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const searchType = document.querySelector('input[name="search-type"]:checked').value;
+
+    const filteredTalks = talks.filter(talk => {
+      if (searchType === 'category') {
+        return talk.categories.some(cat => cat.toLowerCase().includes(searchTerm));
+      } else { // speaker
+        return talk.speakers.some(speaker => speaker.toLowerCase().includes(searchTerm));
+      }
+    });
+    renderSchedule(filteredTalks, searchTerm);
   });
 
-  function renderSchedule(talksToRender) {
+  function renderSchedule(talksToRender, searchTerm) {
     scheduleContainer.innerHTML = '';
     let currentTime = new Date();
     currentTime.setHours(10, 0, 0, 0);
@@ -42,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const startTime = new Date(currentTime);
         let isTalk = false;
 
-        if (i === 3) { // Event 4 (index 3) is Lunch
+        if (i === 3 && !searchTerm) { // Event 4 (index 3) is Lunch
             currentTime.setHours(currentTime.getHours() + 1);
             const endTime = new Date(currentTime);
             scheduleItem.classList.add('break');

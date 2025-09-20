@@ -21,10 +21,20 @@ main {
 }
 
 .search-container {
+  background: #fff;
+  padding: 1rem;
   margin-bottom: 1rem;
 }
 
-#category-search {
+.search-options {
+  margin-bottom: 0.5rem;
+}
+
+.search-options label {
+  margin-right: 1rem;
+}
+
+#search-input {
   width: 100%;
   padding: 0.5rem;
 }

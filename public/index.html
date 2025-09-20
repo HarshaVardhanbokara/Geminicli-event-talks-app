@@ -14,7 +14,18 @@
 
   <main>
     <div class="search-container">
-      <input type="text" id="category-search" placeholder="Search by category...">
+      <div class="search-options">
+        <span>Search by:</span>
+        <label>
+          <input type="radio" name="search-type" value="category" checked>
+          Category
+        </label>
+        <label>
+          <input type="radio" name="search-type" value="speaker">
+          Speaker
+        </label>
+      </div>
+      <input type="text" id="search-input" placeholder="Search...">
     </div>
     <div id="schedule-container">
       <!-- Schedule will be dynamically generated here -->
