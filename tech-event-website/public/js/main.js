@@ -65,7 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (talkIndex < talksToRender.length) {
             isTalk = true;
             const talk = talksToRender[talkIndex];
-            currentTime.setHours(currentTime.getHours() + 1);
+            // Use talk.duration (in minutes) to calculate end time
+            currentTime.setMinutes(currentTime.getMinutes() + talk.duration);
             const endTime = new Date(currentTime);
 
             scheduleItem.classList.add('talk');
