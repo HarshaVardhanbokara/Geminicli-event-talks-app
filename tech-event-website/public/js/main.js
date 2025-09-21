@@ -45,28 +45,28 @@ document.addEventListener('DOMContentLoaded', () => {
     currentTime.setHours(10, 0, 0, 0);
     const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    let talkIndex = 0;
+    const fullSchedule = [];
 
-    for (let i = 0; i < 7; i++) { // Loop for 7 main events (6 talks + 1 lunch)
+    // Populate fullSchedule with talks and a potential lunch break
+    for (let i = 0; i < talksToRender.length; i++) {
+        fullSchedule.push({ type: 'talk', data: talksToRender[i] });
+        // Insert lunch break after the 3rd talk if no search term is active
+        if (i === 2 && !searchTerm) {
+            fullSchedule.push({ type: 'break', title: 'Lunch Break', duration: 60 });
+        }
+    }
+
+    for (const event of fullSchedule) {
         const scheduleItem = document.createElement('div');
         scheduleItem.classList.add('schedule-item');
 
         const startTime = new Date(currentTime);
-        let isTalk = false;
+        let eventDuration = 0;
 
-        if (i === 3 && !searchTerm) { // Event 4 (index 3) is Lunch
-            currentTime.setHours(currentTime.getHours() + 1);
-            const endTime = new Date(currentTime);
-            scheduleItem.classList.add('break');
-            scheduleItem.innerHTML = `
-              <h2>Lunch Break</h2>
-              <p class="time">${formatTime(startTime)} - ${formatTime(endTime)}</p>
-            `;
-        } else if (talkIndex < talksToRender.length) {
-            isTalk = true;
-            const talk = talksToRender[talkIndex];
-            // Use talk.duration (in minutes) to calculate end time
-            currentTime.setMinutes(currentTime.getMinutes() + talk.duration);
+        if (event.type === 'talk') {
+            const talk = event.data;
+            eventDuration = talk.duration;
+            currentTime.setMinutes(currentTime.getMinutes() + eventDuration);
             const endTime = new Date(currentTime);
 
             scheduleItem.classList.add('talk');
@@ -79,16 +79,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${talk.categories.map(cat => `<span>${cat}</span>`).join('')}
               </div>
             `;
-            talkIndex++;
+        } else if (event.type === 'break') {
+            eventDuration = event.duration;
+            currentTime.setMinutes(currentTime.getMinutes() + eventDuration);
+            const endTime = new Date(currentTime);
+
+            scheduleItem.classList.add('break');
+            scheduleItem.innerHTML = `
+              <h2>${event.title}</h2>
+              <p class="time">${formatTime(startTime)} - ${formatTime(endTime)}</p>
+            `;
         }
 
-        if (scheduleItem.innerHTML) {
-            scheduleContainer.appendChild(scheduleItem);
-        }
+        scheduleContainer.appendChild(scheduleItem);
 
-        // Add 10-minute transition after talks, but not after the very last event
-        if (isTalk && i < 6) {
-            currentTime.setMinutes(currentTime.getMinutes() + 10);
+        // Add 10-minute transition after events, but not after the very last event
+        if (event !== fullSchedule[fullSchedule.length - 1]) {
+             currentTime.setMinutes(currentTime.getMinutes() + 10);
         }
     }
   }
