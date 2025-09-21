@@ -83,6 +83,11 @@ main {
   font-size: 0.8rem;
 }
 
+#loading-indicator {
+  font-weight: bold;
+  color: #007bff;
+}
+
 @media (max-width: 600px) {
   main {
     padding: 0.5rem;

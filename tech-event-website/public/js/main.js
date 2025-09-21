@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('search-input');
   let talks = [];
 
+  const loadingIndicator = document.getElementById('loading-indicator');
+
+  // Show loading indicator
+  loadingIndicator.style.display = 'block';
+
   fetch('/api/talks')
     .then(response => {
         if (!response.ok) {
@@ -17,6 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => {
         console.error('Error fetching talks:', error);
         scheduleContainer.innerHTML = '<p style="color: red;">Error: Could not load schedule data.</p>';
+    })
+    .finally(() => {
+      // Hide loading indicator regardless of success or failure
+      loadingIndicator.style.display = 'none';
     });
 
   searchInput.addEventListener('input', () => {
